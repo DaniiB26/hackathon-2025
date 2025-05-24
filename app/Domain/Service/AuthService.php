@@ -16,7 +16,15 @@ class AuthService
     ) {}
 
     public function register(string $username, string $password): User
-    {
+    {   
+        if(strlen($username) < 4) {
+            throw new RuntimeException('Username must be at least 4 characters.');
+        }
+
+        if(!preg_match('/^(?=.*\d).{8,}$/', $password)) {
+            throw new RuntimeException('Password must be at least 8 characters and contain a number.');
+        }
+
         if ($this->users->findByUsername($username)) {
             throw new RuntimeException('Username already taken!');
         }
