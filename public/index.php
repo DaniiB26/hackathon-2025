@@ -12,6 +12,8 @@ use Dotenv\Dotenv;
 $dotenv = Dotenv::createImmutable(__DIR__.'/../');
 $dotenv->load();
 
+session_start();
+
 // creating and running web application
 $app = Kernel::createApp();
 $app->run();
