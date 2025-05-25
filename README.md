@@ -104,10 +104,22 @@ A solution with passing analysis and unit tests will receive extra points.
 ## Delivery details
 
 Participant:
-- Full name: ...
-- Email address: ...
+- Full name: Bangala Daniel
+- Email address: daniib1426@gmail.com
 
 Features fully implemented:
-- ...
+- Register / Login / Logout
+- Expenses CRUD (/expenses)
+- Dashboard (/)
+- CSV Import (in /expenses)
+- Used prepared statements
+- Ensured a user may change/delete only his/her own expenses
+- Used the proper password hashing function in PHP
+- Implemented a “password again” input for ensuring no password typos
+- Used the proper password verify function in PHP
+- Moved budget thresholds as configuration options defined in the .env file
+- Expenses listing
+- CSV file upload: wrapping the whole import in one transaction; and rollback on error
+
 
 Other instructions about setting up the application (if any): ...
