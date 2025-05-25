@@ -6,6 +6,7 @@ namespace App;
 
 use App\Domain\Repository\ExpenseRepositoryInterface;
 use App\Domain\Repository\UserRepositoryInterface;
+use App\Domain\Service\CategoryBudgetConfigService;
 use App\Infrastructure\Persistence\PdoExpenseRepository;
 use App\Infrastructure\Persistence\PdoUserRepository;
 use DI\ContainerBuilder;
@@ -59,6 +60,8 @@ class Kernel
             // Map interfaces to concrete implementations
             UserRepositoryInterface::class    => autowire(PdoUserRepository::class),
             ExpenseRepositoryInterface::class => autowire(PdoExpenseRepository::class),
+
+            CategoryBudgetConfigService::class => autowire(CategoryBudgetConfigService::class),
         ]);
         $container = $builder->build();
 
@@ -74,8 +77,11 @@ class Kernel
         }
 
         $loggedInUserId = $_SESSION['user_id'] ?? null;
+        $loggedInUsername = $_SESSION['username'] ?? null;
+
         $twig = $container->get(Twig::class);
         $twig->getEnvironment()->addGlobal('currentUserId', $loggedInUserId);
+        $twig->getEnvironment()->addGlobal('currentUserName', $loggedInUsername);
 
         return $app;
     }
