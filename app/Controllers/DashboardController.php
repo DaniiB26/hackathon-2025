@@ -23,7 +23,7 @@ class DashboardController extends BaseController
     ) {
         parent::__construct($view);
     }
-
+    
     public function index(Request $request, Response $response): Response
     {
         if (!isset($_SESSION['user_id'])) {
