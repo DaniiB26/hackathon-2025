@@ -26,14 +26,6 @@ class DashboardController extends BaseController
 
     public function index(Request $request, Response $response): Response
     {
-        // TODO: parse the request parameters
-        // TODO: load the currently logged-in user
-        // TODO: get the list of available years for the year-month selector
-        // TODO: call service to generate the overspending alerts for current month
-        // TODO: call service to compute total expenditure per selected year/month
-        // TODO: call service to compute category totals per selected year/month
-        // TODO: call service to compute category averages per selected year/month
-
         if (!isset($_SESSION['user_id'])) {
             return $response->withHeader('Location', '/login')->withStatus(302);
         }
@@ -48,7 +40,7 @@ class DashboardController extends BaseController
         $years = $this->expenseService->getAvailableYearsForUser($userId);
 
         if (!in_array($year, $years, true)) {
-            $year = (int)date('Y');
+            $year = !empty($years) ? max($years) : (int)date('Y');
         }
         if ($month < 1 || $month > 12) {
             $month = (int)date('m');
@@ -56,12 +48,12 @@ class DashboardController extends BaseController
 
         $totalForMonth = $this->summaryService->computeTotalExpenditure($user, $year, $month);
         $totalForMonth = number_format($totalForMonth / 100, 2);
-        
+
         $totalsRaw = $this->summaryService->computePerCategoryTotals($user, $year, $month);
         $averagesRaw = $this->summaryService->computePerCategoryAverages($user, $year, $month);
 
-        $maxTotal = max(array_values($totalsRaw)) ?: 1;
-        $maxAvg = max(array_values($averagesRaw)) ?: 1;
+        $maxTotal = count($totalsRaw) ? max(array_values($totalsRaw)) : 1;
+        $maxAvg = count($averagesRaw) ? max(array_values($averagesRaw)) : 1;
 
         $totalsForCategories = [];
         foreach ($totalsRaw as $category => $totalCents) {
