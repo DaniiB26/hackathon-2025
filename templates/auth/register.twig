@@ -1,27 +1,33 @@
 {% extends 'layout.twig' %}
-{% block title %}Register{% endblock %}
+{% block title %}Register
+{% endblock %}
 {% block content %}
-    <h1 class="text-2xl font-bold mb-4">Register</h1>
-    <form action="/register" method="POST" class="max-w-sm mx-auto">
-        <div class="mb-4">
-            <label for="username" class="block text-gray-400 text-sm font-bold mb-2">Username</label>
-            <input type="text" id="username" name="username" required value="{{ username|default('') }}"
-                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-400 leading-tight focus:outline-none focus:shadow-outline">
-            {% if errors['username'] is defined %}
-                <span class="text-red-500">{{ errors['username'] }}</span>
-            {% endif %}
-        </div>
-        <div class="mb-6">
-            <label for="password" class="block text-gray-400 text-sm font-bold mb-2">Password</label>
-            <input type="password" id="password" name="password" required value="{{ password|default('') }}"
-                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-400 leading-tight focus:outline-none focus:shadow-outline">
-            {% if errors['password'] is defined %}
-                <span class="text-red-500">{{ errors['password'] }}</span>
-            {% endif %}
-        </div>
-        <button type="submit"
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-            Register
-        </button>
-    </form>
+	<h1 class="text-2xl font-bold mb-4">Register</h1>
+
+	{% if errors.general is defined %}
+		<div class="bg-red-900 text-red-200 p-4 rounded mb-4">
+			⚠
+			{{ errors.general }}
+		</div>
+	{% endif %}
+
+	<form action="/register" method="POST" class="max-w-sm mx-auto">
+		<div class="mb-4">
+			<label for="username" class="block text-gray-400 text-sm font-bold mb-2">Username</label>
+			<input type="text" id="username" name="username" required value="{{ username|default('') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-400 leading-tight focus:outline-none focus:shadow-outline">
+			{% if errors['username'] is defined %}
+				<span class="text-red-500">{{ errors['username'] }}</span>
+			{% endif %}
+		</div>
+		<div class="mb-6">
+			<label for="password" class="block text-gray-400 text-sm font-bold mb-2">Password</label>
+			<input type="password" id="password" name="password" required value="{{ password|default('') }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-400 leading-tight focus:outline-none focus:shadow-outline">
+			{% if errors['password'] is defined %}
+				<span class="text-red-500">{{ errors['password'] }}</span>
+			{% endif %}
+		</div>
+		<button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+			Register
+		</button>
+	</form>
 {% endblock %}

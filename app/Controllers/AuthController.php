@@ -39,9 +39,12 @@ class AuthController extends BaseController
             $this->authService->register($username, $password);
             return $response->withHeader('Location', '/login')->withStatus(302);
         } catch (RuntimeException $e) {
-            echo "EROARE: " . $e->getMessage();
-            exit;
-            // TODO: show error in UI later
+            $this->logger->error('Registration failed: ' . $e->getMessage());
+
+            return $this->render($response, 'auth/register.twig', [
+                'errors' => [$e->getMessage()],
+                'old' => ['username' => $username],
+            ]);
         }
     }
 
@@ -62,9 +65,12 @@ class AuthController extends BaseController
             return $response->withHeader('Location', '/')->withStatus(302);
         }
 
-        // TODO: Show the error on UI
-        echo 'Invalid username or password.';
-        exit;
+        $this->logger->warning("Login failed for user: $username");
+
+        return $this->render($response, 'auth/login.twig', [
+            'errors' => ['Invalid username or password.'],
+            'old' => ['username' => $username],
+        ]);
     }
 
     public function logout(Request $request, Response $response): Response
