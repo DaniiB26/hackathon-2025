@@ -24,6 +24,12 @@ class ExpenseController extends BaseController
         parent::__construct($view);
     }
 
+    private function getCategories(): array
+    {
+        return ['groceries', 'utilities', 'entertainment', 'transport', 'housing', 'healthcare', 'other'];
+    }
+
+
     public function index(Request $request, Response $response): Response
     {
         if (!isset($_SESSION['user_id'])) {
@@ -61,9 +67,7 @@ class ExpenseController extends BaseController
 
     public function create(Request $request, Response $response): Response
     {
-        $categories = ['groceries', 'utilities', 'entertainment', 'transport', 'housing', 'healthcare', 'other'];
-
-        // TODO: obtain the list of available categories from configuration and pass to the view
+        $categories = $this->getCategories();
 
         return $this->render($response, 'expenses/create.twig', [
             'categories' => $categories
@@ -72,14 +76,6 @@ class ExpenseController extends BaseController
 
     public function store(Request $request, Response $response): Response
     {
-        // TODO: implement this action method to create a new expense
-
-        // Hints:
-        // - use the session to get the current user ID
-        // - use the expense service to create and persist the expense entity
-        // - rerender the "expenses.create" page with included errors in case of failure
-        // - redirect to the "expenses.index" page in case of success
-
         if (!isset($_SESSION['user_id'])) {
             return $response->withHeader('Location', '/login')->withStatus(302);
         }
@@ -109,7 +105,7 @@ class ExpenseController extends BaseController
 
             return $response->withHeader('Location', '/expenses')->withStatus(302);
         } catch (RuntimeException $e) {
-            $categories = ['groceries', 'utilities', 'entertainment', 'transport', 'housing', 'healthcare', 'other'];
+            $categories = $this->getCategories();
 
 
             return $this->render($response, 'expenses/create.twig', [
@@ -122,13 +118,6 @@ class ExpenseController extends BaseController
 
     public function edit(Request $request, Response $response, array $routeParams): Response
     {
-        // TODO: implement this action method to display the edit expense page
-
-        // Hints:
-        // - obtain the list of available categories from configuration and pass to the view
-        // - load the expense to be edited by its ID (use route params to get it)
-        // - check that the logged-in user is the owner of the edited expense, and fail with 403 if not
-
         if (!isset($_SESSION['user_id'])) {
             return $response->withHeader('Location', '/login')->withStatus(302);
         }
@@ -151,7 +140,7 @@ class ExpenseController extends BaseController
             return $response->withStatus(403); // Forbidden
         }
 
-        $categories = ['groceries', 'utilities', 'entertainment', 'transport', 'housing', 'healthcare', 'other'];
+        $categories = $this->getCategories();
 
         return $this->render($response, 'expenses/edit.twig', [
             'expense' => $expense,
@@ -161,16 +150,6 @@ class ExpenseController extends BaseController
 
     public function update(Request $request, Response $response, array $routeParams): Response
     {
-        // TODO: implement this action method to update an existing expense
-
-        // Hints:
-        // - load the expense to be edited by its ID (use route params to get it)
-        // - check that the logged-in user is the owner of the edited expense, and fail with 403 if not
-        // - get the new values from the request and prepare for update
-        // - update the expense entity with the new values
-        // - rerender the "expenses.edit" page with included errors in case of failure
-        // - redirect to the "expenses.index" page in case of success
-
         if (!isset($_SESSION['user_id'])) {
             return $response->withHeader('Location', '/login')->withStatus(302);
         }
@@ -207,7 +186,7 @@ class ExpenseController extends BaseController
         if (!empty($errors)) {
             return $this->render($response, 'expenses/edit.twig', [
                 'expense' => $expense,
-                'categories' => ['Groceries', 'Utilities', 'Transport', 'Entertainment'],
+                'categories' => $this->getCategories(),
                 'errors' => $errors
             ]);
         }
@@ -219,13 +198,6 @@ class ExpenseController extends BaseController
 
     public function destroy(Request $request, Response $response, array $routeParams): Response
     {
-        // TODO: implement this action method to delete an existing expense
-
-        // - load the expense to be edited by its ID (use route params to get it)
-        // - check that the logged-in user is the owner of the edited expense, and fail with 403 if not
-        // - call the repository method to delete the expense
-        // - redirect to the "expenses.index" page
-
         if (!isset($_SESSION['user_id'])) {
             return $response->withHeader('Location', '/login')->withStatus(302);
         }
@@ -272,7 +244,6 @@ class ExpenseController extends BaseController
 
         try {
             $importedCount = $this->expenseService->importFromCsv($user, $csvFile);
-            // TODO: message for succesfull upload
         } catch (RuntimeException $e) {
             $response->getBody()->write("Import failed: " . $e->getMessage());
             return $response->withStatus(400);
