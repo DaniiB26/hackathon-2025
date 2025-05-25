@@ -34,6 +34,28 @@ class AuthController extends BaseController
 
         $username = trim($data['username'] ?? '');
         $password = $data['password'] ?? '';
+        $passwordConfirm = $data['password_confirm'] ?? '';
+
+        $errors = [];
+
+        if ($username === '') {
+            $errors['username'] = 'Username is required.';
+        }
+
+        if ($password === '') {
+            $errors['password'] = 'Password is required.';
+        }
+
+        if ($password !== $passwordConfirm) {
+            $errors['password_confirm'] = 'Passwords do not match.';
+        }
+
+        if (!empty($errors)) {
+            return $this->render($response, 'auth/register.twig', [
+                'errors' => $errors,
+                'username' => $username,
+            ]);
+        }
 
         try {
             $this->authService->register($username, $password);
@@ -42,8 +64,8 @@ class AuthController extends BaseController
             $this->logger->error('Registration failed: ' . $e->getMessage());
 
             return $this->render($response, 'auth/register.twig', [
-                'errors' => [$e->getMessage()],
-                'old' => ['username' => $username],
+                'errors' => ['username' => $e->getMessage()],
+                'username' => $username,
             ]);
         }
     }
