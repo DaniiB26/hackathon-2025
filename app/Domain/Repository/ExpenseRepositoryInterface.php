@@ -9,8 +9,6 @@ use App\Domain\Entity\User;
 
 interface ExpenseRepositoryInterface
 {
-    // TODO: please review the list of methods below. Keep in mind these are just provided for guidance,
-    // TODO: and there is no requirement to keep them as they are. Feel free to adapt to your own implementation.
 
     public function save(Expense $expense): void;
 
@@ -29,4 +27,10 @@ interface ExpenseRepositoryInterface
     public function averageAmountsByCategory(array $criteria): array;
 
     public function sumAmounts(array $criteria): float;
+
+    public function beginTransaction(): void;
+
+    public function commit(): void;
+    
+    public function rollback(): void;
 }
