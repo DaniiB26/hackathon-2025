@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Domain\Entity\User;
 use App\Domain\Service\ExpenseService;
 use DateTimeImmutable;
 use Exception;
@@ -250,5 +251,33 @@ class ExpenseController extends BaseController
         return $response->withHeader('Location', '/expenses')->withStatus(302);
 
         return $response;
+    }
+
+    public function import(Request $request, Response $response): Response
+    {
+        if (!isset($_SESSION['user_id'])) {
+            return $response->withHeader('Location', '/login')->withStatus(302);
+        }
+
+        $userId = (int)$_SESSION['user_id'];
+        $uploadedFiles = $request->getUploadedFiles();
+
+        if (!isset($uploadedFiles['csv']) || $uploadedFiles['csv']->getError() !== UPLOAD_ERR_OK) {
+            $response->getBody()->write("Invalid CSV upload");
+            return $response->withStatus(400);
+        }
+
+        $csvFile = $uploadedFiles['csv'];
+        $user = new User($userId, '', '', new DateTimeImmutable()); //dummy user
+
+        try {
+            $importedCount = $this->expenseService->importFromCsv($user, $csvFile);
+            // TODO: message for succesfull upload
+        } catch (RuntimeException $e) {
+            $response->getBody()->write("Import failed: " . $e->getMessage());
+            return $response->withStatus(400);
+        }
+
+        return $response->withHeader('Location', '/expenses')->withStatus(302);
     }
 }

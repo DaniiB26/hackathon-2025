@@ -128,6 +128,7 @@ class ExpenseService
 
                 [$dateString, $amount, $description, $category] = $row;
 
+                $category = strtolower(trim($category));
                 if (!in_array($category, $validCategories, true)) {
                     $skippedRows[] = ['reason' => 'Unknown category', 'data' => $row];
                     continue;
