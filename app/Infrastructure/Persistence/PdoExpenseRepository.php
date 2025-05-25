@@ -297,6 +297,23 @@ class PdoExpenseRepository implements ExpenseRepositoryInterface
         );
     }
 
+    public function exists(int $userId, \DateTimeImmutable $date, string $description, int $amountCents, string $category): bool
+    {
+        $statement = $this->pdo->prepare(
+            'SELECT COUNT(*) FROM expenses WHERE user_id = :user_id AND date = :date AND description = :description AND amount_cents = :amount_cents AND category = :category'
+        );
+
+        $statement->execute([
+            'user_id'       => $userId,
+            'date'          => $date->format('Y-m-d H:i:s'),
+            'description'   => $description,
+            'amount_cents'  => $amountCents,
+            'category'      => $category,
+        ]);
+
+        return (int)$statement->fetchColumn() > 0;
+    }
+
     public function beginTransaction(): void
     {
         $this->pdo->beginTransaction();

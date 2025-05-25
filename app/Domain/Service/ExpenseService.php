@@ -12,12 +12,18 @@ use Psr\Http\Message\UploadedFileInterface;
 use RuntimeException;
 use Exception;
 use League\Csv\Reader;
+use Psr\Log\LoggerInterface;
 
 class ExpenseService
 {
+    private LoggerInterface $logger;
+
     public function __construct(
         private readonly ExpenseRepositoryInterface $expenses,
-    ) {}
+        LoggerInterface $logger
+    ) {
+        $this->logger = $logger;
+    }
 
     public function list(int $userId, int $year, int $month, int $pageNumber, int $pageSize): array
     {
@@ -151,6 +157,15 @@ class ExpenseService
                     $skippedRows[] = ['reason' => 'Invalid amount', 'data' => $row];
                     continue;
                 }
+
+                // check for duplicate
+                $amountCents = (int)round($amountFloat * 100);
+
+                if ($this->expenses->exists($user->id, $date, $description, $amountCents, $category)) {
+                    $skippedRows[] = ['reason' => 'Duplicate row', 'data' => $row];
+                    continue;
+                }
+
                 $expense = new Expense(
                     id: null,
                     userId: $user->id,
@@ -164,8 +179,15 @@ class ExpenseService
                 $importedCount++;
             }
             $this->expenses->commit();
+
+            $this->logger->info("CSV import finished. Imported $importedCount expenses.");
+            if (!empty($skippedRows)) {
+                $this->logger->info("Skipped rows during CSV import", $skippedRows);
+            }
+
         } catch (\Throwable $th) {
             $this->expenses->rollBack();
+            $this->logger->error("CSV import failed: " . $th->getMessage());
             throw new RuntimeException('CSV import failed: ' . $th->getMessage());
         }
 

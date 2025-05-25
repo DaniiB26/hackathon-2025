@@ -6,6 +6,7 @@ namespace App\Domain\Repository;
 
 use App\Domain\Entity\Expense;
 use App\Domain\Entity\User;
+use DateTimeImmutable;
 
 interface ExpenseRepositoryInterface
 {
@@ -27,6 +28,8 @@ interface ExpenseRepositoryInterface
     public function averageAmountsByCategory(array $criteria): array;
 
     public function sumAmounts(array $criteria): float;
+
+    public function exists(int $userId, DateTimeImmutable $date, string $description, int $amountCents, string $category): bool;
 
     public function beginTransaction(): void;
 
